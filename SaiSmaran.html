@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>The Synaptic Archive — Ganaparthi Sai Smaran</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<style>
+/* ═══════════════════════════ TOKENS ═══════════════════════════ */
+:root{
+  --black:#030406;--silver:#F5F5F7;--gold:#D4AF37;--gold-faint:rgba(212,175,55,.12);
+  --frame:#111319;--prose:rgba(245,245,247,.72);--dim:rgba(245,245,247,.38);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--silver);font-family:'Cormorant Garamond',Georgia,serif;overflow-x:hidden}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:var(--gold)}
+
+/* ═══════════════════════════ CANVAS / WIRE ═══════════════════════════ */
+#sky-c,#part-c{position:fixed;inset:0;pointer-events:none;z-index:0}
+#part-c{z-index:1}
+#wire-svg{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:2;overflow:visible}
+
+/* ═══════════════════════════ BRAIN MAP ═══════════════════════════ */
+#brain{position:fixed;top:62px;right:12px;width:98px;height:108px;z-index:70;opacity:0;transition:opacity .6s;cursor:help}
+#brain svg{width:100%;height:100%}
+.bn{fill:none;stroke:rgba(212,175,55,.13);stroke-width:1.2;transition:stroke 1.2s,filter 1.2s}
+.bc{fill:none;stroke:rgba(212,175,55,.06);stroke-width:.68;transition:stroke 1.2s}
+.bn.lit{stroke:var(--gold);filter:drop-shadow(0 0 6px rgba(212,175,55,.9))}
+.bc.lit{stroke:rgba(212,175,55,.42)}
+#bflash{position:fixed;inset:0;background:rgba(212,175,55,.06);pointer-events:none;z-index:190;opacity:0}
+#brain-pct{position:fixed;top:178px;right:12px;font-family:'Space Mono',monospace;font-size:7px;letter-spacing:.2em;color:rgba(212,175,55,.4);z-index:70;opacity:0;transition:opacity .6s}
+
+/* ═══════════════════════════ HEADER ═══════════════════════════ */
+#hdr{position:fixed;top:0;left:0;right:0;z-index:80;background:rgba(3,4,6,.84);backdrop-filter:blur(16px);border-bottom:1px solid var(--gold-faint);opacity:0;transition:opacity .5s}
+.hi{max-width:1100px;margin:0 auto;padding:0 18px;height:50px;display:flex;align-items:center;justify-content:space-between}
+.ht{font-family:'Space Mono',monospace;font-size:7.5px;letter-spacing:.32em;color:rgba(245,245,247,.32);text-transform:uppercase}
+#hdr-act{font-family:'Space Mono',monospace;font-size:7.5px;letter-spacing:.22em;color:var(--gold)}
+
+/* ═══════════════════════════ NAV DOTS ═══════════════════════════ */
+#nav{position:fixed;right:8px;top:50%;transform:translateY(-50%);z-index:80;display:flex;flex-direction:column;gap:8px;opacity:0}
+.nd{width:5px;height:5px;border-radius:50%;border:1px solid rgba(212,175,55,.2);background:transparent;cursor:pointer;transition:all .32s}
+.nd.on{background:var(--gold);border-color:var(--gold);box-shadow:0 0 9px rgba(212,175,55,.75);transform:scale(1.65)}
+
+/* ═══════════════════════════ HERO ═══════════════════════════ */
+#hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 20px 60px;position:relative;z-index:10}
+.h-eye{font-family:'Space Mono',monospace;font-size:7.5px;letter-spacing:.44em;color:var(--gold);text-transform:uppercase;margin-bottom:20px;opacity:0;transform:translateY(14px)}
+.h-name{font-family:'Cormorant Garamond',serif;font-size:clamp(34px,9vw,90px);font-weight:300;line-height:.92;color:var(--silver);margin-bottom:16px;opacity:0;transform:translateY(18px)}
+.h-name em{font-style:italic;color:var(--gold)}
+.h-sub{font-family:'Cormorant Garamond',serif;font-size:clamp(14px,1.9vw,18px);font-style:italic;font-weight:300;color:var(--dim);max-width:430px;line-height:1.76;margin-bottom:46px;opacity:0;transform:translateY(14px)}
+.h-cue{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:.36em;color:rgba(212,175,55,.28);text-transform:uppercase;opacity:0}
+.h-tick{width:1px;height:38px;background:linear-gradient(to bottom,var(--gold),transparent);margin:8px auto 0}
+
+/* ═══════════════════════════ ACT SECTION ═══════════════════════════ */
+.act{position:relative;z-index:10;max-width:920px;margin:0 auto;padding:60px 18px 80px;opacity:0;transform:translateY(20px);transition:opacity .85s ease,transform .85s ease}
+.act.vis{opacity:1;transform:none}
+.asep{width:1px;height:38px;background:linear-gradient(to bottom,rgba(212,175,55,.34),rgba(212,175,55,.04));margin:0 auto}
+
+/* ═══════════════════════════ PHOTO GRID ═══════════════════════════ */
+.igrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:860px;margin:0 auto}
+@media(max-width:580px){.igrid{grid-template-columns:repeat(2,1fr)}}
+
+/* ── EACH IMAGE NODE ── */
+.inode{position:relative;cursor:pointer;perspective:900px;margin-top:42px}
+.iwire{position:absolute;top:-42px;left:50%;transform:translateX(-50%);width:1px;height:42px;background:linear-gradient(to bottom,rgba(212,175,55,.3),rgba(212,175,55,.07));pointer-events:none}
+.iinn{position:relative;border:10px solid var(--frame);
+  box-shadow:0 0 0 1px rgba(212,175,55,.09),0 16px 50px rgba(0,0,0,.82);
+  transform-style:preserve-3d;will-change:transform;transition:box-shadow .4s}
+.iinn img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;
+  filter:saturate(.68) contrast(1.09) brightness(.88);transition:filter .5s;pointer-events:none;user-select:none}
+.inode:hover .iinn{box-shadow:0 0 0 1px rgba(212,175,55,.44),0 26px 72px rgba(0,0,0,.92),0 0 38px rgba(212,175,55,.1)}
+.inode:hover .iinn img{filter:saturate(.92) contrast(1.04) brightness(.96)}
+/* frame corner marks */
+.iinn::before,.iinn::after{content:'';position:absolute;z-index:2;width:10px;height:10px;border-color:rgba(212,175,55,.34);border-style:solid;pointer-events:none}
+.iinn::before{top:-10px;left:-10px;border-width:1px 0 0 1px}
+.iinn::after{bottom:-10px;right:-10px;border-width:0 1px 1px 0}
+/* hover ring */
+.ering{position:absolute;inset:-3px;border:1px solid transparent;pointer-events:none;transition:border-color .36s,box-shadow .36s}
+.inode:hover .ering{border-color:rgba(212,175,55,.22);box-shadow:0 0 22px rgba(212,175,55,.1)}
+/* emotion tag */
+.etag{position:absolute;bottom:3px;left:3px;z-index:5;font-family:'Space Mono',monospace;font-size:6px;letter-spacing:.15em;color:rgba(212,175,55,.7);background:rgba(3,4,6,.84);padding:2px 5px;opacity:0;transition:opacity .32s;pointer-events:none;text-transform:uppercase}
+.inode:hover .etag{opacity:1}
+/* connection pulse dot — shows which word in prose this photo links to */
+.ipulse{position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--gold);opacity:0;z-index:5;transition:opacity .3s;box-shadow:0 0 8px rgba(212,175,55,.8)}
+.inode.linked .ipulse{opacity:1;animation:pulse-dot 2s ease-in-out infinite}
+@keyframes pulse-dot{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.4)}}
+
+/* ═══════════════════════════ CONTENT PANEL ═══════════════════════════ */
+.act-layout{display:grid;grid-template-columns:1fr 1fr;gap:40px;max-width:860px;margin:48px auto 0;align-items:start}
+@media(max-width:720px){.act-layout{grid-template-columns:1fr;gap:28px}}
+.albl{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:.46em;color:var(--gold);text-transform:uppercase;margin-bottom:12px}
+.attl{font-family:'Cormorant Garamond',serif;font-size:clamp(20px,4vw,40px);font-weight:300;font-style:italic;line-height:1.04;color:var(--silver);margin-bottom:22px}
+
+/* ── PROSE with word-level connection spans ── */
+.aprose{font-family:'Cormorant Garamond',serif;font-size:clamp(14px,1.9vw,16.5px);font-weight:300;line-height:1.98;color:var(--prose);margin-bottom:24px}
+.aprose .wlink{
+  cursor:crosshair;
+  color:var(--silver);
+  border-bottom:1px dotted rgba(212,175,55,.35);
+  transition:color .22s,border-color .22s;
+  font-weight:400;
+}
+.aprose .wlink:hover,.aprose .wlink.active{
+  color:var(--gold);
+  border-bottom-color:var(--gold);
+}
+
+.adiv{display:flex;align-items:center;gap:12px;margin-bottom:22px;opacity:.55}
+.dl{flex:1;height:1px;background:linear-gradient(to right,transparent,rgba(212,175,55,.28),transparent)}
+.ds{font-size:7.5px;color:var(--gold)}
+.aq{font-family:'Cormorant Garamond',serif;font-size:clamp(13px,1.7vw,15px);font-style:italic;font-weight:300;color:var(--dim);line-height:1.76;padding-left:13px;border-left:1px solid rgba(212,175,55,.16);margin-bottom:0}
+
+/* ── SIDE QUESTIONS PANEL ── */
+.aside-panel{display:flex;flex-direction:column;gap:20px}
+.q-card{border:1px solid var(--gold-faint);padding:18px 16px;background:rgba(17,19,25,.6);backdrop-filter:blur(6px);transition:border-color .3s}
+.q-card:hover{border-color:rgba(212,175,55,.25)}
+.q-card-lbl{font-family:'Space Mono',monospace;font-size:6.5px;letter-spacing:.35em;color:var(--gold);text-transform:uppercase;margin-bottom:8px}
+.q-card-text{font-family:'Cormorant Garamond',serif;font-size:clamp(13px,1.7vw,15px);font-style:italic;color:rgba(245,245,247,.55);line-height:1.7;margin-bottom:12px}
+.q-input{width:100%;background:rgba(3,4,6,.88);border:1px solid rgba(212,175,55,.09);color:var(--silver);font-family:'Cormorant Garamond',serif;font-size:13px;line-height:1.6;padding:9px 11px;resize:none;outline:none;min-height:60px;transition:border-color .3s;margin-bottom:8px}
+.q-input:focus{border-color:rgba(212,175,55,.38)}
+.q-input::placeholder{color:rgba(245,245,247,.16);font-style:italic}
+.q-btn{font-family:'Space Mono',monospace;font-size:6.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--black);background:var(--gold);border:none;padding:7px 16px;cursor:pointer;transition:opacity .28s,transform .18s}
+.q-btn:hover{opacity:.8;transform:translateY(-1px)}
+.q-answers{margin-top:12px;display:flex;flex-direction:column;gap:8px;max-height:140px;overflow-y:auto}
+.q-answers::-webkit-scrollbar{width:2px}.q-answers::-webkit-scrollbar-thumb{background:rgba(212,175,55,.18)}
+.q-ans-item{padding:9px 11px;background:rgba(27,36,33,.38);border-left:2px solid rgba(212,175,55,.16);animation:ein .34s ease-out forwards}
+@keyframes ein{from{opacity:0;transform:translateX(-5px)}to{opacity:1;transform:none}}
+.q-ans-text{font-family:'Cormorant Garamond',serif;font-size:13px;line-height:1.6;color:rgba(245,245,247,.68)}
+.q-ans-ts{font-family:'Space Mono',monospace;font-size:5.5px;letter-spacing:.14em;color:rgba(212,175,55,.24);margin-top:2px}
+
+/* ═══════════════════════════ ECHO GUESTBOOK ═══════════════════════════ */
+.echo-section{max-width:860px;margin:36px auto 0;border:1px solid var(--gold-faint);padding:22px;background:rgba(17,19,25,.62);backdrop-filter:blur(8px)}
+.echo-lbl{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:.42em;color:var(--gold);text-transform:uppercase;margin-bottom:14px}
+.echo-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;margin-bottom:8px}
+@media(max-width:500px){.echo-row{grid-template-columns:1fr}}
+.eta{background:rgba(3,4,6,.9);border:1px solid rgba(212,175,55,.1);color:var(--silver);font-family:'Cormorant Garamond',serif;font-size:14px;line-height:1.64;padding:10px 12px;resize:none;outline:none;min-height:64px;transition:border-color .3s;width:100%}
+.eta:focus{border-color:rgba(212,175,55,.4)}
+.eta::placeholder{color:rgba(245,245,247,.16);font-style:italic}
+.eurl{width:100%;background:rgba(3,4,6,.9);border:1px solid rgba(212,175,55,.07);color:var(--dim);font-family:'Space Mono',monospace;font-size:7px;letter-spacing:.1em;padding:7px 10px;outline:none;transition:border-color .3s;margin-bottom:10px}
+.eurl:focus{border-color:rgba(212,175,55,.26)}
+.ebtn{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:.28em;text-transform:uppercase;color:var(--black);background:var(--gold);border:none;padding:8px 18px;cursor:pointer;transition:opacity .28s,transform .18s;white-space:nowrap;align-self:end}
+.ebtn:hover{opacity:.8;transform:translateY(-1px)}
+.efeed{margin-top:14px;display:flex;flex-direction:column;gap:8px;max-height:170px;overflow-y:auto}
+.efeed::-webkit-scrollbar{width:2px}.efeed::-webkit-scrollbar-thumb{background:rgba(212,175,55,.16)}
+.eitem{padding:10px 12px;background:rgba(27,36,33,.38);border-left:2px solid rgba(212,175,55,.16);animation:ein .34s ease-out forwards}
+.emsg{font-family:'Cormorant Garamond',serif;font-size:13px;line-height:1.6;color:rgba(245,245,247,.7);margin-bottom:3px}
+.epic{margin-top:5px;max-width:100%;max-height:96px;object-fit:cover;filter:saturate(.55)}
+.ets{font-family:'Space Mono',monospace;font-size:5.5px;letter-spacing:.12em;color:rgba(212,175,55,.24)}
+
+/* ═══════════════════════════ STORY MODAL ═══════════════════════════ */
+#modal{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:rgba(3,4,6,.97);backdrop-filter:blur(22px);opacity:0;pointer-events:none;transition:opacity .36s}
+#modal.open{opacity:1;pointer-events:all}
+.mbox{position:relative;max-width:660px;width:92%;max-height:90vh;overflow-y:auto;padding:38px 32px;background:rgba(13,15,20,.96);border:1px solid rgba(212,175,55,.14);transform:translateY(16px);transition:transform .36s}
+#modal.open .mbox{transform:none}
+.mbox::-webkit-scrollbar{width:2px}.mbox::-webkit-scrollbar-thumb{background:var(--gold)}
+.mcl{position:absolute;top:14px;right:14px;font-family:'Space Mono',monospace;font-size:7.5px;letter-spacing:.2em;color:rgba(245,245,247,.28);cursor:pointer;background:none;border:none;transition:color .28s}
+.mcl:hover{color:var(--gold)}
+#mi{width:100%;aspect-ratio:16/10;object-fit:cover;border:10px solid var(--frame);filter:saturate(.75) contrast(1.04);margin-bottom:20px;display:block}
+#mact{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:.42em;color:var(--gold);text-transform:uppercase;margin-bottom:8px}
+#mttl{font-family:'Cormorant Garamond',serif;font-size:clamp(20px,4vw,34px);font-weight:300;font-style:italic;line-height:1.07;color:var(--silver);margin-bottom:16px}
+
+/* prose with highlighted word-links in modal */
+#mpr{font-family:'Cormorant Garamond',serif;font-size:clamp(13px,1.8vw,15.5px);font-weight:300;line-height:1.94;color:var(--prose);margin-bottom:16px}
+#mpr .hl{color:var(--gold);font-style:italic}
+#mq{font-family:'Cormorant Garamond',serif;font-size:clamp(12px,1.6vw,14px);font-style:italic;color:rgba(245,245,247,.36);padding-left:12px;border-left:1px solid rgba(212,175,55,.16);line-height:1.74;margin-bottom:24px}
+.mclbl{font-family:'Space Mono',monospace;font-size:6.5px;letter-spacing:.38em;color:rgba(212,175,55,.34);text-transform:uppercase;margin-bottom:8px}
+.mcrow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.mct{width:56px;height:56px;object-fit:cover;cursor:pointer;filter:saturate(.42) brightness(.64);border:2px solid rgba(212,175,55,.07);transition:filter .28s,border-color .28s}
+.mct:hover{filter:saturate(.9) brightness(.95);border-color:rgba(212,175,55,.36)}
+
+/* in-modal echo */
+.m-echo-lbl{font-family:'Space Mono',monospace;font-size:6.5px;letter-spacing:.38em;color:rgba(212,175,55,.34);text-transform:uppercase;margin-bottom:10px;margin-top:4px}
+.m-eta{width:100%;background:rgba(3,4,6,.9);border:1px solid rgba(212,175,55,.1);color:var(--silver);font-family:'Cormorant Garamond',serif;font-size:13px;line-height:1.62;padding:9px 11px;resize:none;outline:none;min-height:56px;transition:border-color .3s;margin-bottom:7px}
+.m-eta:focus{border-color:rgba(212,175,55,.38)}
+.m-eta::placeholder{color:rgba(245,245,247,.15);font-style:italic}
+.m-eurl{width:100%;background:rgba(3,4,6,.9);border:1px solid rgba(212,175,55,.07);color:var(--dim);font-family:'Space Mono',monospace;font-size:6.5px;letter-spacing:.1em;padding:6px 9px;outline:none;margin-bottom:9px}
+.m-ebtn{font-family:'Space Mono',monospace;font-size:6.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--black);background:var(--gold);border:none;padding:7px 16px;cursor:pointer;transition:opacity .28s}
+.m-ebtn:hover{opacity:.8}
+.m-feed{margin-top:12px;display:flex;flex-direction:column;gap:7px;max-height:120px;overflow-y:auto}
+.m-feed::-webkit-scrollbar{width:2px}.m-feed::-webkit-scrollbar-thumb{background:rgba(212,175,55,.16)}
+
+/* ═══════════════════════════ PAGE CURTAIN ═══════════════════════════ */
+#curtain{position:fixed;inset:0;z-index:170;pointer-events:none;background:linear-gradient(148deg,var(--frame) 0%,#181a22 100%);clip-path:polygon(100% 0,100% 0,100% 100%,100% 100%);opacity:0}
+
+/* ═══════════════════════════ FOOTER ═══════════════════════════ */
+#foot{position:relative;z-index:10;max-width:920px;margin:0 auto;padding:52px 18px 68px;border-top:1px solid var(--gold-faint);opacity:0}
+.fn{text-align:center;margin-bottom:36px}
+.fn h2{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,3vw,26px);font-weight:300;font-style:italic;color:var(--silver);margin-bottom:6px}
+.fn p{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:.3em;color:rgba(212,175,55,.34);text-transform:uppercase}
+.fl{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;max-width:400px;margin:0 auto 26px}
+@media(min-width:500px){.fl{grid-template-columns:repeat(4,1fr)}}
+.fla{display:block;text-align:center;padding:11px 7px;border:1px solid var(--gold-faint);font-family:'Space Mono',monospace;font-size:6.5px;letter-spacing:.2em;color:rgba(245,245,247,.34);text-decoration:none;text-transform:uppercase;transition:all .28s}
+.fla:hover{border-color:var(--gold);color:var(--gold);background:rgba(212,175,55,.04)}
+.fla span{display:block;font-size:14px;margin-bottom:5px}
+.fco{text-align:center;font-family:'Space Mono',monospace;font-size:6px;letter-spacing:.2em;color:rgba(245,245,247,.1);text-transform:uppercase}
+
+/* ═══════════════════════════ STARS ═══════════════════════════ */
+.star{position:fixed;border-radius:50%;background:#fff;pointer-events:none;z-index:1;animation:stw var(--d,3s) ease-in-out infinite var(--dl,0s)}
+@keyframes stw{0%,100%{opacity:var(--a,.07)}50%{opacity:var(--b,.48)}}
+#stars{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0;transition:opacity 2.2s ease}
+
+/* ═══════════════════════════ WORD-HIGHLIGHT TOOLTIP ═══════════════════════════ */
+#word-tip{
+  position:fixed;z-index:150;pointer-events:none;opacity:0;transition:opacity .22s;
+  background:rgba(13,15,20,.94);border:1px solid rgba(212,175,55,.2);
+  padding:10px 14px;max-width:220px;
+}
+#word-tip p{font-family:'Cormorant Garamond',serif;font-size:13px;font-style:italic;color:var(--dim);line-height:1.6}
+
+/* CRITICAL: images must NEVER show text cursor or activate word interactions */
+.iinn img{pointer-events:none!important;user-select:none!important}
+.iinn{pointer-events:auto}
+/* wlink only inside prose — not on images */
+.aprose .wlink{cursor:crosshair}
+/* image node tooltip — only fires from img-node level, not from inside wlink */
+.inode img{pointer-events:none}
+
+@media(max-width:580px){
+  #brain{width:64px;height:72px;top:56px;right:7px}
+  #brain-pct{top:134px;right:7px;font-size:6px}
+  .iinn{border-width:6px}
+  #nav{display:none}
+  .mbox{padding:20px 14px}
+  .act-layout{gap:22px}
+  .echo-row{grid-template-columns:1fr}
+  .ebtn{width:100%}
+}
+</style>
+</head>
+<body>
+
+<canvas id="sky-c"></canvas>
+<canvas id="part-c"></canvas>
+<div id="stars"></div>
+
+<!-- HEADPHONE WIRE SVG -->
+<svg id="wire-svg" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="wg" x="-70%" y="-70%" width="240%" height="240%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="wg2">
+      <feGaussianBlur stdDeviation="7" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g id="wg-paths"></g>
+</svg>
+
+<!-- BRAIN MAP -->
+<div id="brain" title="Your neural map — lights up as you journey">
+  <svg viewBox="0 0 104 114" xmlns="http://www.w3.org/2000/svg">
+    <path class="bn" id="bn0" d="M25,54 Q11,36 15,22 Q23,7 39,13 Q49,17 52,29"/>
+    <path class="bn" id="bn1" d="M79,54 Q93,36 89,22 Q81,7 65,13 Q55,17 52,29"/>
+    <path class="bn" id="bn2" d="M39,13 Q52,4 65,13 Q53,28 52,29"/>
+    <path class="bn" id="bn3" d="M15,22 Q7,46 17,61 Q25,72 35,68 Q45,62 52,54"/>
+    <path class="bn" id="bn4" d="M89,22 Q97,46 87,61 Q79,72 69,68 Q59,62 52,54"/>
+    <ellipse class="bn" id="bn5" cx="52" cy="51" rx="15" ry="8.5"/>
+    <path class="bn" id="bn6" d="M29,78 Q52,93 75,78 Q71,67 52,71 Q33,67 29,78 Z"/>
+    <path class="bn" id="bn7" d="M45,89 L45,105 Q52,109 59,105 L59,89"/>
+    <line class="bc" id="bc0" x1="52" y1="29" x2="52" y2="29"/>
+    <line class="bc" id="bc1" x1="52" y1="54" x2="52" y2="54"/>
+    <line class="bc" id="bc2" x1="52" y1="71" x2="52" y2="89"/>
+    <text x="52" y="112" font-family="'Space Mono',monospace" font-size="4" fill="rgba(212,175,55,.32)" text-anchor="middle" letter-spacing=".8">NEURAL MAP</text>
+  </svg>
+</div>
+<div id="brain-pct">0 / 5</div>
+<div id="bflash"></div>
+
+<!-- WORD TOOLTIP -->
+<div id="word-tip"><p id="word-tip-text"></p></div>
+
+<header id="hdr">
+  <div class="hi">
+    <span class="ht">The Synaptic Archive · Ganaparthi Sai Smaran</span>
+    <span id="hdr-act">ACT I · V</span>
+  </div>
+</header>
+<nav id="nav"></nav>
+
+<section id="hero">
+  <p class="h-eye">A Neural Map of Memory · Verse · Photography</p>
+  <h1 class="h-name">Ganaparthi<br><em>Sai Smaran</em></h1>
+  <p class="h-sub">The one man listening in the dark through headphones —<br>Author · Photographer · Architect of Strange Weather</p>
+  <div class="h-cue"><span>Enter the Archive</span><div class="h-tick"></div></div>
+</section>
+
+<main id="root"></main>
+
+<footer id="foot">
+  <div class="fn"><h2>Ganaparthi Sai Smaran</h2><p>Author · Photographer · The Ghost Note</p></div>
+  <nav class="fl">
+    <a href="https://share.google/XsxN7ODrFqqpTlf6n" target="_blank" rel="noopener" class="fla"><span>📸</span>Photography</a>
+    <a href="https://amzn.in/d/0f7qsr8X" target="_blank" rel="noopener" class="fla"><span>📖</span>Echoes of Heart</a>
+    <a href="https://amzn.in/d/02eif5LI" target="_blank" rel="noopener" class="fla"><span>🎵</span>The Ghost Note</a>
+    <a href="https://amzn.in/d/08COmqGR" target="_blank" rel="noopener" class="fla"><span>🌧️</span>Strange Weather</a>
+  </nav>
+  <p class="fco">© 2026 Ganaparthi Sai Smaran · The Synaptic Archive · All rights reserved</p>
+</footer>
+
+<!-- STORY MODAL -->
+<div id="modal" role="dialog" aria-modal="true">
+  <div class="mbox">
+    <button class="mcl" id="mcl">✕ CLOSE</button>
+    <img id="mi" src="" alt="">
+    <p id="mact"></p>
+    <h2 id="mttl"></h2>
+    <p id="mpr"></p>
+    <blockquote id="mq"></blockquote>
+    <p class="mclbl">// Connected Memories</p>
+    <div class="mcrow" id="mcrow"></div>
+    <p class="m-echo-lbl">// Leave your echo on this memory</p>
+    <textarea class="m-eta" id="m-eta" placeholder="What does this moment make you feel…" rows="3"></textarea>
+    <input class="m-eurl" id="m-eurl" type="text" placeholder="Paste your own image URL — share your visual memory">
+    <button class="m-ebtn" id="m-ebtn">Transmit ↗</button>
+    <div class="m-feed" id="m-feed"></div>
+  </div>
+</div>
+<div id="curtain"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   YOUR 45 EXACT UNSPLASH URLs — verbatim from profile
+═══════════════════════════════════════════════════ */
+const P=[
+"https://images.unsplash.com/photo-1676657894823-70bd0c6a0c28?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MXx8fGVufDB8fHx8fA%3D%3D",
+"https://images.unsplash.com/photo-1674563814872-79d5fa734bce?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8M3x8fGVufDB8fHx8fA%3D%3D",
+"https://images.unsplash.com/photo-1685884512759-254ee6d4cbe2?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8NXx8fGVufDB8fHx8fA%3D%3D",
+"https://images.unsplash.com/photo-1684167852839-b89fcb6d645f?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8NHx8fGVufDB8fHx8fA%3D%3D",
+"https://images.unsplash.com/photo-1781203630546-32cd26b18af7?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MTF8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1779886505319-6f00373e5104?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MTV8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1772843532886-9f74f20c8b80?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MjB8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1768493429974-52e9d07077bd?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MzF8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1763786554581-5cb18e60e252?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MzR8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1762688652758-91e52cb776be?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MzV8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1759495051146-32097d836633?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8Mzl8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1759024349692-21e9b86b7a12?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8NDJ8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1759233476767-edf2af41be00?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8NDB8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1759024349639-b81602a5ef6a?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8NDV8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1759024349715-00fffb8daadb?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8NDh8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1757345257922-cc53b89e56cf?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8NTJ8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1743526374130-efea08ffab73?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8NjJ8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1743350337456-b90530e80a0d?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8NjN8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1724691509855-a70c7160a489?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8NzJ8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1707271564416-1502779870f2?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8ODB8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1707271564450-b18fafe731b3?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8Nzl8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1702036780861-53914558ab7e?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8ODN8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1702036780917-4035e59220aa?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8ODV8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1700497902480-a39ed899c13a?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8OTF8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1700497969904-48f7e25d1d02?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8OTd8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1694279166754-f45555844a19?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8OTh8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1685884652802-67b97d01ba3d?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MTA0fHx8ZW58MHx8fHx8",
+"https://images.unsplash.com/photo-1684167851978-2109222eab6b?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MTExfHx8ZW58MHx8fHx8",
+"https://images.unsplash.com/photo-1684167852336-b5df337e2c99?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MTE2fHx8ZW58MHx8fHx8",
+"https://images.unsplash.com/photo-1681450101072-0c72f37309e8?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MTIzfHx8ZW58MHx8fHx8",
+"https://images.unsplash.com/photo-1680611603637-431653b96c90?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MTI4fHx8ZW58MHx8fHx8",
+"https://images.unsplash.com/photo-1679237959664-2dd0e204bab3?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MTMxfHx8ZW58MHx8fHx8",
+"https://images.unsplash.com/photo-1679237959645-9fa4181108fa?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MTMzfHx8ZW58MHx8fHx8",
+"https://images.unsplash.com/photo-1673754533971-906dfd2c1edd?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MTUwfHx8ZW58MHx8fHx8",
+"https://images.unsplash.com/photo-1668578966206-73150905a22e?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MTUxfHx8ZW58MHx8fHx8",
+"https://images.unsplash.com/photo-1668571850846-8af955f8960e?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MTUzfHx8ZW58MHx8fHx8",
+"https://images.unsplash.com/photo-1668312929980-c4a3dc12518b?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MTU1fHx8ZW58MHx8fHx8",
+"https://images.unsplash.com/photo-1667645431027-ddad204d6882?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MTYxfHx8ZW58MHx8fHx8",
+"https://images.unsplash.com/photo-1688303384342-e8d90bcc73e5?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MTAyfHx8ZW58MHx8fHx8",
+"https://images.unsplash.com/photo-1700497889513-aba62d302592?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8OTZ8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1700497937543-0fd165f06f92?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8OTR8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1759024349535-37c1ece4b987?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8NDl8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1759024349679-1ed5f86cf770?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8NDF8fHxlbnwwfHx8fHw%3D",
+"https://images.unsplash.com/photo-1765278003867-eabc53c6cb16?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MzN8fHxlbnwwfHx8fHw%3D"
+];
+
+/* ═══════════════════════════════════════════════════
+   MASTER ARCHIVE DATA
+   Each image has a linked keyword that ties it to
+   a specific phrase in the prose — the word-image bond
+═══════════════════════════════════════════════════ */
+const SA=[
+{
+  id:1, act:"ACT I", chapter:"CH. I // THE INITIAL GRAVITY",
+  title:"The Canvas of Shifting Shades",
+  source:"Echoes of the Heart (2024)",
+  season:"dawn", brainLight:["bn0","bc0"], actLabel:"ACT I · V",
+  // Dawn light, warm golden skies, water reflections, misty mornings —
+  // these are the shades your camera caught when life still felt full of color
+  images:[P[0],P[1],P[3],P[5],P[25],P[26],P[29],P[30],P[2]],
+  emotions:["shifting","golden","depth","blend","light","warmth","alive","dusk","mist"],
+  wordLinks:["color","masterpiece","blend","depth","alive","living","painting","picture","change"],
+  wordTooltips:[
+    "Every shade your lens has ever caught — this is what color means.",
+    "A single frame is never the whole story. Neither is a single feeling.",
+    "The blend is where you truly exist — not in one tone alone.",
+    "Depth only comes when you let more than one thing in.",
+    "This is what alive looks like when it's captured honestly.",
+    "You are the art you are living — not the one you planned to make.",
+    "Every photo you've taken is a stroke on the canvas of who you are.",
+    "If the picture never changes, neither will the life behind the lens.",
+    "Change is just the next frame your camera hasn't taken yet."
+  ],
+  questions:[
+    {q:"If your life was a single color right now, which one would it be?", hint:"A word, a shade, a feeling…"},
+    {q:"Which emotion have you been avoiding painting into your life?", hint:"What color is it?"},
+    {q:"Is there a season of your life you wish you could go back and add more color to?", hint:"Share it if you want…"}
+  ],
+  prose:`Life isn't meant to be painted in a single <span class="wlink" data-wi="0">color</span>. One shade — no matter how beautiful — can never become a <span class="wlink" data-wi="1">masterpiece</span>. Joy alone isn't life. Neither is pain. It's the shifting <span class="wlink" data-wi="2">blend</span> — the quiet blues, the burning reds, the uncertain greys — that gives life its <span class="wlink" data-wi="3">depth</span>. Every emotion is a color. Every phase, a new stroke on the canvas. Try to live in one color, and life becomes flat. But when you allow them all — when you mix, layer, and even clash them — you create something real… something <span class="wlink" data-wi="4">alive</span>. Because in the end, it's not the art you've made that matters — it's the art you are <span class="wlink" data-wi="5">living</span>. And just like any <span class="wlink" data-wi="6">painting</span>, if the colors never <span class="wlink" data-wi="8">change</span>, neither will the <span class="wlink" data-wi="7">picture</span>.`
+},
+{
+  id:2, act:"ACT II", chapter:"CH. I // DECEPTIVE GAZE",
+  title:"Shattered Trust within the Orbit",
+  source:"Echoes of the Heart (2024)",
+  season:"twilight", brainLight:["bn1","bn2"], actLabel:"ACT II · V",
+  // Twilight skies — the hour that looks beautiful but holds something heavy.
+  // Moody light, bare branches, structures under dim sky, the quiet that follows something breaking.
+  // These are frames you took when you weren't even thinking about why.
+  images:[P[7],P[8],P[9],P[10],P[11],P[31],P[32],P[27],P[28]],
+  emotions:["dusk","heavy","bare","distance","dim","still","fractured","quiet","weighted"],
+  wordLinks:["trusted","break","shattered","fragments","orbit","words","love","tears","undeserved"],
+  wordTooltips:[
+    "You gave all of it — and that was never the mistake.",
+    "Some things only break so you can finally see what was hollow inside them.",
+    "Shattered doesn't mean destroyed. It means rearranged.",
+    "Fragments are not the end of the story. They are the beginning of a new shape.",
+    "Every orbit has a centre. Yours has always been you — not them.",
+    "Words that were meant to keep you became the ones that let you go.",
+    "Love that had to deceive itself was never fully love.",
+    "Tears are not weakness. They are the body finishing what the heart started.",
+    "What was undeserved will not define what you are owed next."
+  ],
+  questions:[
+    {q:"Has someone's words ever changed your entire world — for better or worse?", hint:"You don't need to name them…"},
+    {q:"When trust breaks, what's the first thing you reach for?", hint:"Music? Silence? A walk outside?"},
+    {q:"What has betrayal taught you about yourself that nothing else could?", hint:"Take your time with this one."}
+  ],
+  prose:`I don't know why I <span class="wlink" data-wi="0">trusted</span> you with all my heart, even knowing you might <span class="wlink" data-wi="1">break</span> it into pieces. Perhaps it was hope that you'd take care of it. But you didn't. You <span class="wlink" data-wi="2">shattered</span> it into countless <span class="wlink" data-wi="3">fragments</span>. I often recall the day your sweet words ensnared my trust, pulling me into your <span class="wlink" data-wi="4">orbit</span>. Those <span class="wlink" data-wi="5">words</span> weren't mere words — they were secret love letters to my heart. Your <span class="wlink" data-wi="6">love</span>, now tainted by betrayal, will forever flow with <span class="wlink" data-wi="7">tears</span> — a love <span class="wlink" data-wi="8">undeserved</span>.`
+},
+{
+  id:3, act:"ACT III", chapter:"CH. II // THE UNEQUAL STORM",
+  title:"The Rainfall as Real Irrigation",
+  source:"The Lyrics of Strange Weather (June 2026)",
+  season:"rain", brainLight:["bn3","bn4","bc1"], actLabel:"ACT III · V",
+  // Overcast skies, misty hills, rain-touched leaves, golden sunsets breaking through clouds —
+  // the camera sees what comes after the storm: green, growth, light returning.
+  // These are the frames that prove the rain was worth it.
+  images:[P[12],P[13],P[14],P[15],P[33],P[41],P[38],P[6],P[4]],
+  emotions:["overcast","mist","green","storm","clearing","earth","growth","clouds","light"],
+  wordLinks:["rain","earth","sensing","tears","grow","farming","greenish","beside","carry"],
+  wordTooltips:[
+    "Rain in a photo always looks heavier than it felt. So do the hard seasons.",
+    "The earth doesn't fight the rain. It receives it and decides what to grow.",
+    "Sensing is the first act of healing — before understanding, before moving on.",
+    "Tears and rain look the same from a distance. Both mean something is being cleaned.",
+    "Look closely — this frame shows something growing. So are you.",
+    "Every green thing in your lens came from a storm that passed before it.",
+    "Greenish — not fully arrived yet. That's exactly the most honest place to be.",
+    "You have to be the one beside yourself before anyone else can reach you.",
+    "Who carries you? This question is not a burden. It is an invitation."
+  ],
+  questions:[
+    {q:"What are your recent storms growing inside of you — can you see the green yet?", hint:"It's okay if you can't yet."},
+    {q:"When was the last time you let yourself feel something fully, without stopping it?", hint:"No need to explain why."},
+    {q:"What would you grow if your tears became the rain for something new?", hint:"Dream it out loud here."}
+  ],
+  prose:`It will <span class="wlink" data-wi="0">rain</span> where your real ideas fall onto the <span class="wlink" data-wi="1">earth</span>. It's not the earth — it's the you who are feeling it, who are <span class="wlink" data-wi="2">sensing</span> it. Use those same <span class="wlink" data-wi="3">tears</span>, that same rain which was sad, to <span class="wlink" data-wi="4">grow</span> something back. A <span class="wlink" data-wi="5">farming</span> of happiness — where the same water that hurt you now feeds something new. If there is no rain, there won't be any farming, there won't be any <span class="wlink" data-wi="6">greenish</span>. Same way, if there are no tears, there won't be anything to clear them. You don't need any person <span class="wlink" data-wi="7">beside</span> you to clean the tears. But beside you, you need to be there. If you don't live here, who will <span class="wlink" data-wi="8">carry</span> you?`
+},
+{
+  id:4, act:"ACT IV", chapter:"CH. III // KINETIC MOMENTUM",
+  title:"The Kinetic Force of Shifting Currents",
+  source:"The Lyrics of Strange Weather (June 2026)",
+  season:"wind", brainLight:["bn5","bn6"], actLabel:"ACT IV · V",
+  // Rivers, waterfalls, open skies, sunsets with movement in the clouds —
+  // nature caught mid-motion by your lens. Not posed. Not still.
+  // These are frames that breathe because you were moving when you took them.
+  images:[P[16],P[17],P[18],P[42],P[43],P[39],P[40],P[24],P[19]],
+  emotions:["current","flow","open","sky","movement","horizon","river","wind","forward"],
+  wordLinks:["moves","wind","flow","stuck","rocks","step","change","growth","forward"],
+  wordTooltips:[
+    "This frame was only possible because something was moving — the light, the air, you.",
+    "The wind is invisible in every photo. You only see what it touches.",
+    "Rivers in a frame look peaceful. You know they never stop pushing.",
+    "Stuck is what the frame looks like when nothing is moving. Look again.",
+    "Water finds its path through rocks not by force — by persistence.",
+    "One step. That's all the difference between this frame and the next.",
+    "Change doesn't announce itself. It just appears in the next photo you didn't plan.",
+    "Growth looks like this — not loud, not sudden. Just quietly further than before.",
+    "Forward is the only direction that keeps the light in front of you."
+  ],
+  questions:[
+    {q:"Are you the wind pushing yourself forward — or the leaf waiting for a breeze?", hint:"Be honest with yourself."},
+    {q:"What is one thing in your life that has stayed still too long?", hint:"Just name it. That's the first movement."},
+    {q:"When did nature last remind you of something important about your own life?", hint:"A moment, a place, a feeling."}
+  ],
+  prose:`Everything in nature <span class="wlink" data-wi="0">moves</span>. Leaves don't dance without the <span class="wlink" data-wi="1">wind</span>. Rivers don't <span class="wlink" data-wi="2">flow</span> without rain. Nothing moves on its own — something always pushes it forward. And you're no different. Without movement, nothing changes. Not your life, not your thoughts, not your path. You can look back — that's fine. But if you stay there, you become still. And stillness, when it lasts too long, turns into being <span class="wlink" data-wi="3">stuck</span>. Look at nature closely — the way water finds its path even through <span class="wlink" data-wi="4">rocks</span>. It never stops. It adapts. It moves. That's not illusion. That's how life works. So if you don't move yourself, nothing will move for you. You are the force behind your own <span class="wlink" data-wi="6">change</span>. The meaning, the direction, the <span class="wlink" data-wi="7">growth</span> — all of it begins with you taking a <span class="wlink" data-wi="5">step</span>.`
+},
+{
+  id:5, act:"ACT V", chapter:"UNVOICED TRUTHS // 11:00 PM",
+  title:"The Magic of the 11:00 PM Window Seat",
+  source:"The Ghost Note (2025)",
+  season:"midnight", brainLight:["bn7","bc2"], actLabel:"ACT V · V",
+  // This moment cannot be photographed. No camera was out.
+  // These are the frames from before and after — the moon you saw on other nights,
+  // skies that carry the same feeling, the same silence, the same something.
+  // Not the moment itself. The echo of it. That's all a photo can ever hold.
+  images:[P[20],P[21],P[22],P[23],P[34],P[35],P[36],P[37],P[6]],
+  emotions:["moonrise","night sky","stillness","late hour","silence","open air","horizon","dusk","echo"],
+  wordLinks:["feeling","night","cold","moon","song","wind","connects","belongs","magic"],
+  wordTooltips:[
+    "This feeling — you know it. You've felt it before you had words for it.",
+    "Not the night itself. The echo of it. That's what these frames hold.",
+    "Cold air doesn't photograph. But this frame carries the memory of it.",
+    "The moon was always there. You only noticed it when everything else went quiet.",
+    "No photo was taken that night. The song played and the phone stayed in the pocket.",
+    "The wind in this frame is the same wind. Just a different night.",
+    "Connection doesn't announce itself. It arrives when you stop looking for it.",
+    "Some moments belong only to you. A photo would have taken you out of it.",
+    "Magic doesn't come when you try. It comes when you allow."
+  ],
+  questions:[
+    {q:"What thought have you shared with the night wind that you're afraid daylight will make you forget?", hint:"Write it here. Keep it safe."},
+    {q:"What random song found you at exactly the right moment in your life?", hint:"You don't have to explain why."},
+    {q:"When was the last time you felt truly part of something — even just the night?", hint:"A moment only you remember."}
+  ],
+  prose:`Some moments cannot be photographed. This is one of them. Picture this — a <span class="wlink" data-wi="1">night</span> journey, around 11 p.m. You're sitting by the window of a bus. You slide it open. That <span class="wlink" data-wi="2">cold</span> air rushes in — soft, gentle, alive. It brushes your face and something inside you feels lighter. You look outside. The <span class="wlink" data-wi="3">moon</span> is there — quiet, bright, distant. Not loud, not demanding — just present. Then it happens. A random <span class="wlink" data-wi="4">song</span> starts playing in your earphones — not the one you searched for, but the one you needed. The <span class="wlink" data-wi="5">wind</span> you feel. The moon you see. The thoughts you didn't plan to think. The song you didn't choose. Everything <span class="wlink" data-wi="6">connects</span>. You're not just watching the night — you're part of it. This <span class="wlink" data-wi="7">belongs</span> only to you. What you see in these frames isn't the moment. It's the closest the camera could get to the <span class="wlink" data-wi="0">feeling</span> — and sometimes, that's enough. The <span class="wlink" data-wi="8">magic</span> doesn't come when you try. It comes when you allow.`
+}
+];
+
+/* ═══════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════ */
+const echoStore={};
+SA.forEach(a=>echoStore[a.id]=[]);
+const qAnswers={};
+SA.forEach(a=>qAnswers[a.id]=a.questions.map(()=>[]));
+let currentModalActId=null;
+
+/* ═══════════════════════════════════════════════════
+   BUILD DOM
+═══════════════════════════════════════════════════ */
+const root=document.getElementById('root');
+const navEl=document.getElementById('nav');
+
+SA.forEach((act,ai)=>{
+  // Nav dot
+  const dot=document.createElement('div');
+  dot.className='nd'+(ai===0?' on':'');
+  dot.dataset.i=ai; dot.title=act.title;
+  dot.addEventListener('click',()=>pageTurn(ai));
+  navEl.appendChild(dot);
+
+  const sec=document.createElement('section');
+  sec.className='act'; sec.id=`act-${ai}`;
+  sec.dataset.ai=ai; sec.dataset.season=act.season;
+
+  // Photo grid
+  const grid=act.images.map((src,ii)=>`
+    <div class="inode" id="n${ai}-${ii}" data-ai="${ai}" data-ii="${ii}" tabindex="0" role="button" aria-label="${act.emotions[ii]}">
+      <div class="iwire"></div>
+      <div class="iinn">
+        <img src="${src}" alt="${act.emotions[ii]}" loading="${ai===0&&ii<3?'eager':'lazy'}">
+        <div class="ering"></div>
+        <div class="ipulse"></div>
+      </div>
+      <span class="etag">${act.emotions[ii]||''}</span>
+    </div>`).join('');
+
+  // Side questions panel
+  const qcards=act.questions.map((qo,qi)=>`
+    <div class="q-card">
+      <p class="q-card-lbl">// Question ${qi+1}</p>
+      <p class="q-card-text">${qo.q}</p>
+      <textarea class="q-input" data-acid="${act.id}" data-qi="${qi}" placeholder="${qo.hint}" rows="2"></textarea>
+      <button class="q-btn" data-acid="${act.id}" data-qi="${qi}">Share →</button>
+      <div class="q-answers" id="qa-${act.id}-${qi}"></div>
+    </div>`).join('');
+
+  sec.innerHTML=`
+    <div class="asep"></div>
+    <div class="igrid">${grid}</div>
+    <div class="act-layout">
+      <div class="act-left">
+        <p class="albl">${act.act} // ${act.source}</p>
+        <h2 class="attl">${act.title}</h2>
+        <p class="aprose">${act.prose}</p>
+        <div class="adiv"><div class="dl"></div><span class="ds">◈</span><div class="dl"></div></div>
+      </div>
+      <div class="aside-panel">${qcards}</div>
+    </div>
+    <div class="echo-section">
+      <p class="echo-lbl">// Leave an Echo on this Act</p>
+      <div class="echo-row">
+        <textarea class="eta" placeholder="Your thought… your color… your moment in this frequency…" rows="3"></textarea>
+        <button class="ebtn" data-acid="${act.id}">Transmit Echo ↗</button>
+      </div>
+      <input class="eurl" type="text" placeholder="Paste an image URL — share your own visual memory (optional)">
+      <div class="efeed" id="feed-${act.id}"></div>
+    </div>`;
+  root.appendChild(sec);
+});
+
+/* ── QUESTION SUBMIT ── */
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('.q-btn');
+  if(!btn) return;
+  const acid=parseInt(btn.dataset.acid);
+  const qi=parseInt(btn.dataset.qi);
+  const card=btn.closest('.q-card');
+  const ta=card.querySelector('.q-input');
+  const txt=ta.value.trim();
+  if(!txt){ta.style.borderColor='rgba(212,175,55,.5)';setTimeout(()=>ta.style.borderColor='',700);return;}
+  const feed=document.getElementById(`qa-${acid}-${qi}`);
+  const ts=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  const el=document.createElement('div');
+  el.className='q-ans-item';
+  el.innerHTML=`<p class="q-ans-text">${esc(txt)}</p><p class="q-ans-ts">${ts}</p>`;
+  feed.prepend(el);
+  ta.value='';
+  qAnswers[acid][qi].unshift({txt,ts});
+});
+
+/* ── ECHO SUBMIT ── */
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('.ebtn');
+  if(!btn) return;
+  const acid=parseInt(btn.dataset.acid);
+  const wrap=btn.closest('.echo-section');
+  const ta=wrap.querySelector('.eta');
+  const ui=wrap.querySelector('.eurl');
+  const feed=document.getElementById(`feed-${acid}`);
+  const txt=ta.value.trim();
+  if(!txt){ta.style.borderColor='rgba(212,175,55,.5)';setTimeout(()=>ta.style.borderColor='',700);return;}
+  const ts=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  const el=document.createElement('div');el.className='eitem';
+  el.innerHTML=`<p class="emsg">${esc(txt)}</p>${ui.value.trim()?`<img class="epic" src="${esc(ui.value.trim())}" alt="" onerror="this.style.display='none'">`:''}<p class="ets">${ts}</p>`;
+  feed.prepend(el);ta.value='';ui.value='';
+  echoStore[acid].unshift({txt,img:ui.value,ts});
+});
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+/* ═══════════════════════════════════════════════════
+   WORD ↔ IMAGE LINKING SYSTEM
+   Hovering a .wlink highlights the corresponding image
+   Hovering an image highlights the matching word
+   FIXED: events fully separated, no cross-firing
+═══════════════════════════════════════════════════ */
+const tip=document.getElementById('word-tip');
+const tipText=document.getElementById('word-tip-text');
+let tipVisible=false;
+
+function showTip(text,x,y){
+  tipText.textContent=text;
+  tip.style.left=Math.min(x+18,window.innerWidth-244)+'px';
+  tip.style.top=Math.max(y-60,10)+'px';
+  tip.style.opacity='1';
+  tipVisible=true;
+}
+function hideTip(){tip.style.opacity='0';tipVisible=false;}
+
+// WORD → IMAGE: only fires when target is exactly a .wlink span (not inside .inode)
+document.addEventListener('mouseover',e=>{
+  const wl=e.target.closest('.wlink');
+  // Guard: must NOT be inside an image node
+  if(!wl||e.target.closest('.inode')) return;
+  const actEl=wl.closest('.act');
+  if(!actEl) return;
+  const ai=parseInt(actEl.dataset.ai);
+  const wi=parseInt(wl.dataset.wi);
+  const act=SA[ai];
+  const node=document.getElementById(`n${ai}-${wi}`);
+  if(node) node.classList.add('linked');
+  wl.classList.add('active');
+  if(act.wordTooltips[wi]) showTip(act.wordTooltips[wi],e.clientX,e.clientY);
+});
+document.addEventListener('mouseout',e=>{
+  const wl=e.target.closest('.wlink');
+  if(!wl||e.target.closest('.inode')) return;
+  const actEl=wl.closest('.act');
+  if(!actEl) return;
+  const ai=parseInt(actEl.dataset.ai);
+  const wi=parseInt(wl.dataset.wi);
+  const node=document.getElementById(`n${ai}-${wi}`);
+  if(node) node.classList.remove('linked');
+  wl.classList.remove('active');
+  hideTip();
+});
+
+// Move tip with mouse when word is hovered
+document.addEventListener('mousemove',e=>{
+  if(!tipVisible) return;
+  if(e.target.closest('.wlink')&&!e.target.closest('.inode')){
+    tip.style.left=Math.min(e.clientX+18,window.innerWidth-244)+'px';
+    tip.style.top=Math.max(e.clientY-60,10)+'px';
+  }
+});
+
+// IMAGE → WORD: only fires from .inode, shows tooltip at image level
+document.addEventListener('mouseover',e=>{
+  const node=e.target.closest('.inode');
+  // Guard: tooltip only when mousing over the inode itself or its image child
+  if(!node) return;
+  // Don't double-fire if a wlink is somehow involved
+  if(e.target.closest('.wlink')) return;
+  const ai=parseInt(node.dataset.ai);
+  const ii=parseInt(node.dataset.ii);
+  const act=SA[ai];
+  const sec=document.getElementById(`act-${ai}`);
+  if(sec) sec.querySelectorAll(`.wlink[data-wi="${ii}"]`).forEach(w=>w.classList.add('active'));
+  if(act.wordTooltips[ii]) showTip(act.wordTooltips[ii],e.clientX,e.clientY);
+});
+document.addEventListener('mouseout',e=>{
+  const node=e.target.closest('.inode');
+  if(!node||e.target.closest('.wlink')) return;
+  const ai=parseInt(node.dataset.ai);
+  const ii=parseInt(node.dataset.ii);
+  const sec=document.getElementById(`act-${ai}`);
+  if(sec) sec.querySelectorAll(`.wlink[data-wi="${ii}"]`).forEach(w=>w.classList.remove('active'));
+  hideTip();
+});
+
+/* ═══════════════════════════════════════════════════
+   3D TILT
+═══════════════════════════════════════════════════ */
+function initTilt(node){
+  const inner=node.querySelector('.iinn'); if(!inner) return;
+  const apply=(x,y,r)=>{
+    const rx=-((y-r.height/2)/(r.height/2))*13;
+    const ry=((x-r.width/2)/(r.width/2))*13;
+    gsap.to(inner,{rotationX:rx,rotationY:ry,transformPerspective:780,ease:'power2.out',duration:.28});
+  };
+  const reset=()=>gsap.to(inner,{rotationX:0,rotationY:0,duration:.85,ease:'elastic.out(1,.42)'});
+  node.addEventListener('mousemove',e=>apply(e.offsetX,e.offsetY,node.getBoundingClientRect()));
+  node.addEventListener('mouseleave',reset);
+  node.addEventListener('touchmove',e=>{const t=e.touches[0],r=node.getBoundingClientRect();apply(t.clientX-r.left,t.clientY-r.top,r);},{passive:true});
+  node.addEventListener('touchend',reset);
+}
+document.querySelectorAll('.inode').forEach(node=>{
+  initTilt(node);
+  const fn=()=>openModal(parseInt(node.dataset.ai),parseInt(node.dataset.ii));
+  node.addEventListener('click',fn);
+  node.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')fn();});
+});
+
+/* ═══════════════════════════════════════════════════
+   STORY MODAL
+═══════════════════════════════════════════════════ */
+const modal=document.getElementById('modal');
+function openModal(ai,ii){
+  const act=SA[ai];
+  currentModalActId=act.id;
+  document.getElementById('mi').src=act.images[ii];
+  document.getElementById('mi').alt=act.emotions[ii]||act.title;
+  document.getElementById('mact').textContent=`${act.act} // ${act.chapter}`;
+  document.getElementById('mttl').textContent=act.title;
+  // Prose with highlighted word
+  let highlightedProse=act.prose.replace(/<span class="wlink"[^>]*>/g,'').replace(/<\/span>/g,'');
+  // Re-highlight just the word linked to this image
+  if(act.wordLinks[ii]){
+    const word=act.wordLinks[ii];
+    highlightedProse=highlightedProse.replace(new RegExp(`\\b${word}\\b`,'i'),m=>`<span class="hl">${m}</span>`);
+  }
+  document.getElementById('mpr').innerHTML=highlightedProse;
+  document.getElementById('mq').textContent=act.questions[0].q;
+
+  // Connected memories
+  const cr=document.getElementById('mcrow'); cr.innerHTML='';
+  const others=act.images.filter((_,i)=>i!==ii).slice(0,4);
+  const next=SA[(ai+1)%SA.length];
+  [...others,...next.images.slice(0,3)].slice(0,7).forEach((src,ci)=>{
+    const img=document.createElement('img');
+    img.className='mct'; img.src=src; img.loading='lazy';
+    img.addEventListener('click',()=>{
+      const tai=ci<others.length?ai:(ai+1)%SA.length;
+      openModal(tai,Math.max(0,SA[tai].images.indexOf(src)));
+    });
+    cr.appendChild(img);
+  });
+
+  modal.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){modal.classList.remove('open');document.body.style.overflow='';}
+document.getElementById('mcl').addEventListener('click',closeModal);
+modal.addEventListener('click',e=>{if(e.target===modal)closeModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+// Modal echo
+document.getElementById('m-ebtn').addEventListener('click',()=>{
+  const ta=document.getElementById('m-eta');
+  const ui=document.getElementById('m-eurl');
+  const feed=document.getElementById('m-feed');
+  const txt=ta.value.trim();
+  if(!txt){ta.style.borderColor='rgba(212,175,55,.5)';setTimeout(()=>ta.style.borderColor='',700);return;}
+  const ts=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  const el=document.createElement('div'); el.className='eitem';
+  el.innerHTML=`<p class="emsg">${esc(txt)}</p>${ui.value.trim()?`<img class="epic" src="${esc(ui.value.trim())}" alt="" onerror="this.style.display='none'">`:''}<p class="ets">${ts}</p>`;
+  feed.prepend(el); ta.value=''; ui.value='';
+  if(currentModalActId) echoStore[currentModalActId].unshift({txt});
+});
+
+/* ═══════════════════════════════════════════════════
+   PAGE TURN
+═══════════════════════════════════════════════════ */
+const curtain=document.getElementById('curtain');
+function pageTurn(ai){
+  const sec=document.getElementById(`act-${ai}`); if(!sec) return;
+  gsap.set(curtain,{opacity:1,clipPath:'polygon(100% 0,100% 0,100% 100%,100% 100%)'});
+  gsap.to(curtain,{clipPath:'polygon(0% 0,100% 0,100% 100%,0% 100%)',duration:.3,ease:'power3.in',
+    onComplete:()=>{sec.scrollIntoView({behavior:'instant',block:'start'});
+      gsap.to(curtain,{clipPath:'polygon(0% 0,0% 0,0% 100%,0% 100%)',duration:.36,ease:'power3.out',
+        onComplete:()=>gsap.set(curtain,{opacity:0})});}});
+}
+
+/* ═══════════════════════════════════════════════════
+   GSAP SCROLL + BRAIN ASSEMBLY
+═══════════════════════════════════════════════════ */
+gsap.registerPlugin(ScrollTrigger);
+gsap.to('#hdr',{opacity:1,duration:.8,delay:.4,ease:'power2.out'});
+gsap.to('#nav',{opacity:1,duration:.8,delay:.75,ease:'power2.out'});
+gsap.to('#brain',{opacity:1,duration:1,delay:1.1,ease:'power2.out'});
+gsap.to('#brain-pct',{opacity:1,duration:1,delay:1.2,ease:'power2.out'});
+gsap.timeline({delay:.3})
+  .to('.h-eye',{opacity:1,y:0,duration:.7,ease:'power3.out'},0)
+  .to('.h-name',{opacity:1,y:0,duration:.95,ease:'power3.out'},.2)
+  .to('.h-sub',{opacity:1,y:0,duration:.7,ease:'power3.out'},.5)
+  .to('.h-cue',{opacity:1,duration:.6,ease:'power2.out'},.95);
+
+SA.forEach((act,ai)=>{
+  const sec=document.getElementById(`act-${ai}`); if(!sec) return;
+  ScrollTrigger.create({
+    trigger:sec, start:'top 80%', end:'bottom top',
+    onEnter:()=>{
+      sec.classList.add('vis');
+      applySeason(act.season);
+      updateBrainForAct(ai);
+      setNav(ai);
+      document.getElementById('hdr-act').textContent=act.actLabel;
+      gsap.fromTo(sec.querySelectorAll('.inode'),
+        {opacity:0,y:18,scale:.97},
+        {opacity:1,y:0,scale:1,duration:.62,stagger:.055,ease:'power2.out',delay:.1});
+      gsap.fromTo(sec.querySelectorAll('.act-left > *,.aside-panel > *'),
+        {opacity:0,y:14},{opacity:1,y:0,duration:.6,stagger:.08,ease:'power2.out',delay:.3});
+    },
+    onEnterBack:()=>{
+      // Scrolling back up INTO this section
+      applySeason(act.season);
+      updateBrainForAct(ai);
+      setNav(ai);
+      document.getElementById('hdr-act').textContent=act.actLabel;
+    }
+  });
+  gsap.to(`#act-${ai} .igrid`,{y:12,ease:'none',
+    scrollTrigger:{trigger:sec,start:'top bottom',end:'bottom top',scrub:1.8}});
+});
+ScrollTrigger.create({trigger:'#foot',start:'top 88%',
+  onEnter:()=>gsap.to('#foot',{opacity:1,duration:1,ease:'power2.out'})});
+
+function setNav(ai){document.querySelectorAll('.nd').forEach((d,i)=>d.classList.toggle('on',i===ai));}
+
+// IntersectionObserver for smooth nav + brain sync while scrolling
+document.querySelectorAll('.act').forEach(s=>
+  new IntersectionObserver(entries=>{entries.forEach(e=>{
+    if(e.isIntersecting&&e.intersectionRatio>.3){
+      const ai=parseInt(e.target.dataset.ai);
+      setNav(ai);
+      document.getElementById('hdr-act').textContent=SA[ai].actLabel;
+      if(!completedBrain) updateBrainForAct(ai);
+      applySeason(SA[ai].season);
+    }});
+  },{threshold:0.3}).observe(s));
+
+/* ── BRAIN — BIDIRECTIONAL ── */
+// Track which act is currently visible
+// When scrolling back up → brain dims to show only nodes up to current act
+const brainActNodes = [
+  ["bn0","bc0"],   // act 0
+  ["bn1","bn2"],   // act 1
+  ["bn3","bn4","bc1"], // act 2
+  ["bn5","bn6"],   // act 3
+  ["bn7","bc2"]    // act 4
+];
+const ALL_BRAIN_IDS = ["bn0","bn1","bn2","bn3","bn4","bn5","bn6","bn7","bc0","bc1","bc2"];
+let completedBrain = false;
+
+function updateBrainForAct(ai){
+  if(completedBrain) return; // once complete, stays complete
+  // Dim all nodes first
+  ALL_BRAIN_IDS.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.classList.remove('lit');
+  });
+  // Re-light all nodes UP TO AND INCLUDING current act
+  for(let i=0;i<=ai;i++){
+    if(brainActNodes[i]){
+      brainActNodes[i].forEach(id=>{
+        const el=document.getElementById(id);
+        if(el) el.classList.add('lit');
+      });
+    }
+  }
+  // Update counter
+  document.getElementById('brain-pct').textContent=`${ai+1} / 5`;
+  // Final act — complete the brain
+  if(ai===SA.length-1 && !completedBrain){
+    completedBrain=true;
+    ALL_BRAIN_IDS.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('lit');});
+    document.getElementById('brain-pct').textContent='Complete ✦';
+    const f=document.getElementById('bflash');
+    gsap.to(f,{opacity:1,duration:.3,yoyo:true,repeat:5,ease:'power2.inOut',
+      onComplete:()=>gsap.set(f,{opacity:0})});
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   HEADPHONE WIRE ENGINE
+═══════════════════════════════════════════════════ */
+const wg=document.getElementById('wg-paths');
+let allN=[],dashOff=0;
+function gatherN(){allN=Array.from(document.querySelectorAll('.iinn'));}
+
+function drawWires(){
+  dashOff-=.36;
+  if(!allN.length){gatherN();requestAnimationFrame(drawWires);return;}
+  wg.innerHTML='';
+  const pts=allN.map(n=>{const r=n.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height*.82};});
+
+  // Primary sequential chain
+  for(let i=1;i<pts.length;i++){
+    const a=pts[i-1],b=pts[i];
+    const mY=a.y+(b.y-a.y)*.5;
+    const slk=52+Math.sin(i*1.85)*30,sag=26+Math.cos(i*.8)*16;
+    const d=`M ${a.x} ${a.y} C ${a.x+slk} ${mY-sag}, ${b.x-slk} ${mY+sag}, ${b.x} ${b.y}`;
+    // Glow
+    const glo=document.createElementNS('http://www.w3.org/2000/svg','path');
+    glo.setAttribute('d',d);glo.setAttribute('fill','none');
+    glo.setAttribute('stroke','rgba(212,175,55,0.07)');glo.setAttribute('stroke-width','5');
+    glo.setAttribute('filter','url(#wg2)');glo.setAttribute('stroke-linecap','round');
+    wg.appendChild(glo);
+    // Wire
+    const t=.1+Math.sin(i*.65+Date.now()*.0007)*.06;
+    const wire=document.createElementNS('http://www.w3.org/2000/svg','path');
+    wire.setAttribute('d',d);wire.setAttribute('fill','none');
+    wire.setAttribute('stroke',`rgba(212,175,55,${t})`);wire.setAttribute('stroke-width','1.3');
+    wire.setAttribute('stroke-linecap','round');wire.setAttribute('stroke-dasharray','2.5 8');
+    wire.setAttribute('stroke-dashoffset',dashOff);wire.setAttribute('filter','url(#wg)');
+    wg.appendChild(wire);
+  }
+  // Emotional cross-links
+  [[0,9],[2,14],[4,20],[6,24],[1,16],[8,27]].forEach(([a2,b2])=>{
+    if(a2>=pts.length||b2>=pts.length)return;
+    const a=pts[a2],b=pts[b2];
+    const mx=(a.x+b.x)/2,my=(a.y+b.y)/2,c=45+Math.abs(a.x-b.x)*.2;
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d',`M ${a.x} ${a.y} Q ${mx+c} ${my-c}, ${b.x} ${b.y}`);
+    p.setAttribute('fill','none');p.setAttribute('stroke','rgba(212,175,55,0.04)');
+    p.setAttribute('stroke-width','.75');p.setAttribute('stroke-dasharray','1.5 11');
+    p.setAttribute('stroke-dashoffset',dashOff*.4);
+    wg.appendChild(p);
+  });
+  requestAnimationFrame(drawWires);
+}
+window.addEventListener('load',()=>{gatherN();drawWires();window.addEventListener('resize',gatherN,{passive:true});});
+
+/* ═══════════════════════════════════════════════════
+   ATMOSPHERE + PARTICLES
+═══════════════════════════════════════════════════ */
+const skyC=document.getElementById('sky-c'),skyCtx=skyC.getContext('2d');
+const partC=document.getElementById('part-c'),partCtx=partC.getContext('2d');
+const seasons={
+  dawn:{g:[[0,'rgba(60,26,6,0.6)'],[.66,'rgba(3,4,6,0)']],cx:.5,cy:0,r:.72,pts:'dust',pc:26},
+  twilight:{g:[[0,'rgba(16,6,40,0.7)'],[.66,'rgba(3,4,6,0)']],cx:.3,cy:.12,r:.78,pts:'dust',pc:20},
+  rain:{g:[[0,'rgba(5,14,22,0.75)'],[.7,'rgba(3,4,6,0)']],cx:.5,cy:.22,r:.82,pts:'rain',pc:90},
+  wind:{g:[[0,'rgba(6,22,11,0.6)'],[.66,'rgba(3,4,6,0)']],cx:.7,cy:.1,r:.74,pts:'dust',pc:30},
+  midnight:{g:[[0,'rgba(3,3,28,0.9)'],[.74,'rgba(3,4,6,0)']],cx:.5,cy:.04,r:.76,pts:'stars',pc:70}
+};
+let curS='dawn',parts=[];
+function resize(){skyC.width=partC.width=window.innerWidth;skyC.height=partC.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize,{passive:true});
+function applySeason(s){
+  if(s===curS&&parts.length)return;curS=s;initParts();
+  const sf=document.getElementById('stars');
+  if(s==='midnight'){buildStars();sf.style.opacity='1';}else sf.style.opacity='0';
+}
+function drawSky(){
+  const cfg=seasons[curS]||seasons.dawn;
+  skyCtx.clearRect(0,0,skyC.width,skyC.height);
+  const R=Math.max(skyC.width,skyC.height)*cfg.r;
+  const grd=skyCtx.createRadialGradient(skyC.width*cfg.cx,skyC.height*cfg.cy,0,skyC.width*cfg.cx,skyC.height*cfg.cy,R);
+  cfg.g.forEach(([st,c])=>grd.addColorStop(st,c));
+  skyCtx.fillStyle=grd;skyCtx.fillRect(0,0,skyC.width,skyC.height);
+  requestAnimationFrame(drawSky);
+}
+drawSky();
+function initParts(){
+  parts=[];const cfg=seasons[curS];const w=partC.width,h=partC.height;
+  if(cfg.pts==='rain'){for(let i=0;i<cfg.pc;i++)parts.push({type:'rain',x:Math.random()*w,y:Math.random()*h,l:Math.random()*14+7,xs:Math.random()*.7-.35,ys:Math.random()*5+4.5,op:Math.random()*.2+.04});}
+  else if(cfg.pts==='dust'){for(let i=0;i<cfg.pc;i++)parts.push({type:'dust',x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.3+.3,vx:(Math.random()-.5)*.45,vy:-Math.random()*.32-.07,op:Math.random()*.14+.04,ph:Math.random()*Math.PI*2,spd:Math.random()*.03+.01});}
+  else{for(let i=0;i<cfg.pc;i++)parts.push({type:'star',x:Math.random()*w,y:Math.random()*h*.64,r:Math.random()*1.55+.32,op:Math.random()*.52+.1,ph:Math.random()*Math.PI*2,spd:Math.random()*.024+.007});}
+}
+initParts();
+function drawParts(){
+  partCtx.clearRect(0,0,partC.width,partC.height);const w=partC.width,h=partC.height;
+  parts.forEach(p=>{
+    p.ph+=(p.spd||0);
+    if(p.type==='rain'){
+      partCtx.beginPath();partCtx.moveTo(p.x,p.y);partCtx.lineTo(p.x+p.xs*p.l,p.y+p.l);
+      partCtx.strokeStyle=`rgba(168,202,225,${p.op})`;partCtx.lineWidth=.7;partCtx.stroke();
+      p.x+=p.xs;p.y+=p.ys;if(p.y>h){p.y=-p.l;p.x=Math.random()*w;}
+    }else{
+      const a=p.op*(0.66+0.34*Math.sin(p.ph));
+      partCtx.beginPath();partCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      partCtx.fillStyle=p.type==='star'?`rgba(245,245,255,${a})`:`rgba(212,175,55,${a*.55})`;
+      partCtx.fill();p.x+=(p.vx||0);p.y+=(p.vy||0);
+      if(p.y<0)p.y=h;if(p.x<0)p.x=w;if(p.x>w)p.x=0;
+    }});
+  requestAnimationFrame(drawParts);
+}
+drawParts();
+function buildStars(){
+  const sf=document.getElementById('stars');sf.innerHTML='';
+  for(let i=0;i<60;i++){
+    const s=document.createElement('div');s.className='star';
+    const sz=(Math.random()*1.7+.38).toFixed(1);
+    const d=(Math.random()*3.2+2.1).toFixed(1),dl=(Math.random()*4.5).toFixed(1);
+    const a=(Math.random()*.06+.04).toFixed(2),b=(Math.random()*.52+.18).toFixed(2);
+    s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*64}vh;left:${Math.random()*100}vw;--d:${d}s;--dl:${dl}s;--a:${a};--b:${b}`;
+    sf.appendChild(s);
+  }
+}
+applySeason('dawn');
+</script>
+</body>
+</html>
