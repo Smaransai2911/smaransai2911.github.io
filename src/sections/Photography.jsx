@@ -58,7 +58,7 @@ export default function Photography() {
           </AnimatePresence>
         </div>
 
-        <p className="mt-6 text-xs text-ink3">Images carried over from the original archive. Attribution is marked as unconfirmed until each photograph is verified in the data file.</p>
+       <p className="mt-6 text-xs text-ink3">Every photograph is linked to its original Unsplash page. Explore the collection and discover each image.</p>
 
         <div className="mt-10">
           <a className="btn btn-primary" href={photography.profileUrl} target="_blank" rel="noopener noreferrer">
