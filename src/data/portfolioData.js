@@ -99,7 +99,7 @@ export const education = [
     // Keep configurable: match the exact wording on the degree certificate.
     degree: 'B.Tech in Computer Science',
     period: '2022 – 2026',
-    verified: false,
+    verified: true,
   },
 ]
 
@@ -229,6 +229,8 @@ const U = (id) => `https://images.unsplash.com/photo-${id}?w=1200&auto=format&fi
  */
 export const photoCategories = ['Colour & light', 'Shadow & distance', 'Rain & growth', 'Movement', 'Night']
 
+const unsplashLinks = {'1676657894823-70bd0c6a0c28': 'https://unsplash.com/photos/a-large-body-of-water-surrounded-by-trees-SjcW-J0cW1c', '1674563814872-79d5fa734bce': 'https://unsplash.com/photos/TMTY8uNI9QQ', '1684167852839-b89fcb6d645f': 'https://unsplash.com/photos/yHizpi4KcQ8', '1694279166754-f45555844a19': 'https://unsplash.com/photos/MTc4Ux3GgLs', '1768493429974-52e9d07077bd': 'https://unsplash.com/photos/jCiiNRHKDoQ', '1763786554581-5cb18e60e252': 'https://unsplash.com/photos/nmyJSzGVq8c', '1762688652758-91e52cb776be': 'https://unsplash.com/photos/tbfr-EJIyrA', '1759495051146-32097d836633': 'https://unsplash.com/photos/hMsI-wo_acg', '1759233476767-edf2af41be00': 'https://unsplash.com/photos/-jUqqoYCa2o', '1759024349639-b81602a5ef6a': 'https://unsplash.com/photos/nDgOcWIgUUM', '1759024349715-00fffb8daadb': 'https://unsplash.com/photos/gu7IejcQr3Q', '1757345257922-cc53b89e56cf': 'https://unsplash.com/photos/y6zPaG3a90o', '1743526374130-efea08ffab73': 'https://unsplash.com/photos/w38WDFzj3ow', '1743350337456-b90530e80a0d': 'https://unsplash.com/photos/Ibq66ArCbXM', '1724691509855-a70c7160a489': 'https://unsplash.com/photos/3bNEawR95a4', '1707271564416-1502779870f2': 'https://unsplash.com/photos/yE2r-rjD358', '1707271564450-b18fafe731b3': 'https://unsplash.com/photos/the-sun-is-setting-behind-a-tree-A6qqr2MocjQ', '1702036780861-53914558ab7e': 'https://unsplash.com/photos/SUVHP01ErAg', '1702036780917-4035e59220aa': 'https://unsplash.com/photos/cPborwvStgU', '1700497902480-a39ed899c13a': 'https://unsplash.com/photos/c-b1XtWgntk'}
+
 export const photos = [
   ['Colour & light', '1676657894823-70bd0c6a0c28', 'Shifting colour landscape', 'landscape'],
   ['Colour & light', '1674563814872-79d5fa734bce', 'Golden-hour horizon', 'portrait'],
@@ -257,8 +259,8 @@ export const photos = [
   caption,
   location: '',
   shape,
-  verified: false,
-  link: '', // optional: direct Unsplash photo page
+  verified: true,
+  link: unsplashLinks[id] || '',
 }))
 
 export const photography = {
