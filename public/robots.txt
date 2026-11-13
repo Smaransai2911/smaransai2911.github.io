@@ -1,4 +1,3 @@
 User-agent: *
 Allow: /
-
 Sitemap: https://smaransai2911.github.io/sitemap.xml
