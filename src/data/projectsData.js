@@ -1,10 +1,11 @@
+
 /**
- * Add, remove or edit projects here. No UI changes required.
+ * Project portfolio data.
  *
- * IMPORTANT: every entry below is a SAMPLE placeholder (`sample: true`).
- * They show the card structure only and are NOT completed work.
- * Replace them with real projects and set `sample: false`.
+ * Each entry represents a project you have actually worked on.
+ * Add, remove or edit projects here. No UI changes required.
  */
+
 export const projectCategories = [
   'Artificial Intelligence / Machine Learning',
   'Data Engineering',
@@ -14,61 +15,91 @@ export const projectCategories = [
 
 export const projects = [
   {
-    id: 'sample-ai',
-    sample: true,
+    id: 'multimodal-vision-transformer',
+    sample: false,
     featured: true,
-    title: 'Sample: AI / ML project',
+    title: 'Multimodal Vision Transformer for Respiratory Disease Classification',
     category: 'Artificial Intelligence / Machine Learning',
-    status: 'Placeholder',
-    problem: 'Describe the problem this project addresses.',
-    solution: 'Describe what you built and how it works, in your own words.',
-    description: 'One or two sentences summarising the project.',
-    stack: ['Python'],
-    github: '',
-    demo: '',
-    image: '', // screenshot or architecture diagram, e.g. /projects/ai.webp
-  },
-  {
-    id: 'sample-de',
-    sample: true,
-    featured: false,
-    title: 'Sample: Data engineering project',
-    category: 'Data Engineering',
-    status: 'Placeholder',
-    problem: 'Describe the data problem (sources, volume, constraints).',
-    solution: 'Describe the pipeline or workflow you designed.',
-    description: 'One or two sentences summarising the project.',
-    stack: ['SQL', 'Python'],
-    github: '',
-    demo: '',
-    image: '',
-  },
-  {
-    id: 'sample-da',
-    sample: true,
-    featured: false,
-    title: 'Sample: Data analytics project',
-    category: 'Data Analytics',
-    status: 'Placeholder',
-    problem: 'Describe the question the analysis answers.',
-    solution: 'Describe the approach, dashboards or findings.',
-    description: 'One or two sentences summarising the project.',
-    stack: ['Power BI', 'SQL'],
+    status: 'Completed',
+    year: '2026',
+    problem:
+      'Respiratory diseases such as COVID-19, Pneumonia and Tuberculosis require accurate analysis of medical imaging data.',
+    solution:
+      'Built a dual-branch ViT-B/16 deep learning system integrating CT scan and chest X-ray images for automated respiratory disease classification. Implemented Grad-CAM explainability to visualise and validate clinically relevant diagnostic regions.',
+    description:
+      'A multimodal deep learning system for respiratory disease classification, evaluated on a 14,700-image dataset.',
+    stack: [
+      'Deep Learning',
+      'Vision Transformer (ViT-B/16)',
+      'Computer Vision',
+      'Grad-CAM',
+      'Medical Imaging',
+    ],
+    highlights: [
+      'Achieved 88% validation accuracy.',
+      'Recorded F1 scores between 85% and 91% across four disease classes.',
+      'Used a dataset containing 14,700 medical images.',
+      'Implemented Grad-CAM for model explainability.',
+    ],
     github: '',
     demo: '',
     image: '',
   },
+
   {
-    id: 'sample-py',
-    sample: true,
-    featured: false,
-    title: 'Sample: Python development project',
+    id: 'au-chatbot',
+    sample: false,
+    featured: true,
+    title: 'Alliance University Virtual Assistant (AU-ChatBot)',
     category: 'Python Development',
-    status: 'Placeholder',
-    problem: 'Describe the task being automated or built.',
-    solution: 'Describe the tool or application you wrote.',
-    description: 'One or two sentences summarising the project.',
-    stack: ['Python'],
+    status: 'Completed',
+    year: '2025',
+    problem:
+      'Developed a virtual assistant to handle university-related queries across multiple intent categories.',
+    solution:
+      'Built an NLP-driven REST API backend in Java supporting more than 50 intent categories and over 100 users. Integrated webhook automation and collaborated with senior engineers through Agile sprints.',
+    description:
+      'An NLP-driven university virtual assistant with REST API integration and webhook automation.',
+    stack: [
+      'Java',
+      'Natural Language Processing',
+      'REST API',
+      'Webhook Automation',
+      'Git',
+      'Agile',
+    ],
+    highlights: [
+      'Supported more than 50 intent categories.',
+      'Served over 100 users.',
+      'Webhook automation reduced resolution time by 60%.',
+      'Maintained structured documentation and version-controlled code.',
+    ],
+    github: '',
+    demo: '',
+    image: '',
+  },
+
+  {
+    id: 'student-research-agent',
+    sample: false,
+    featured: true,
+    title: 'Student Research Agent',
+    category: 'Artificial Intelligence / Machine Learning',
+    status: 'Developed',
+    year: '2026',
+    problem:
+      'A student-focused research application developed using AI and large language model integrations.',
+    solution:
+      'Developed a full-stack AI application with a Python backend, JavaScript/Streamlit user interface and LLM API integrations.',
+    description:
+      'A full-stack AI application combining a Python backend, an interactive interface and LLM API integrations.',
+    stack: [
+      'Python',
+      'JavaScript',
+      'Streamlit',
+      'Large Language Models',
+      'LLM API Integration',
+    ],
     github: '',
     demo: '',
     image: '',
