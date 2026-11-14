@@ -116,7 +116,7 @@ export const projects = [
     title: 'Financial Time Series Forecasting ML Pipeline',
     category: [
     'Artificial Intelligence / Machine Learning',
-  ' Data Analytics',
+    ' Data Analytics',
     ],
     problem:
       'Financial time series forecasting requires systematic data preparation, feature engineering and model evaluation.',
