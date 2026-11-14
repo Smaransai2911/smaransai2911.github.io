@@ -133,7 +133,7 @@ export const books = [
   {
     id: 'echoes',
     title: 'Echoes of Heart',
-    year: '2024', // from the archive's source label; confirm
+    year: 'Dec 2024', // from the archive's source label; confirm
     description: '',
     archiveNote: 'Writing from this book anchors Acts I and II of The Synaptic Archive.',
     amazon: AMAZON_ECHOES,
@@ -153,8 +153,8 @@ export const books = [
   {
     id: 'ghost',
     title: 'The Ghost Note',
-    year: '2025', // from the archive's source label; confirm
-    description: '',
+    year: 'Feb 2025', // from the archive's source label; confirm
+    description: 'A Story of Noise, Silence, and the Things We Don’t Hear',
     archiveNote: 'Writing from this book anchors Act V of The Synaptic Archive.',
     amazon: AMAZON_GHOST,
     cover: '/books/the-ghost-note.webp',
@@ -191,7 +191,7 @@ export const books = [
     id: 'vision',
     title: 'The Vision Within',
     subtitle: 'From You to Me',
-    year: '',
+    year: 'June 2026',
     description: '',
     archiveNote: '',
     amazon: 'https://www.amazon.in/dp/B0H8NVVLM1',
@@ -202,8 +202,8 @@ export const books = [
   {
     id: 'introduced',
     title: 'The Book That Introduced Me to Myself',
-    subtitle: '',
-    year: '',
+    subtitle: 'A journey of thoughts, moments, and learning to meet the person I was searching for',
+    year: 'Aug 2026',
     description: '',
     archiveNote: '',
     amazon: 'https://www.amazon.in/dp/B0HFDVJQK2',
