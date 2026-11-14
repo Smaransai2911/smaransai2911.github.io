@@ -11,7 +11,7 @@ export const projectCategories = [
   'Data Engineering',
   'Data Analytics',
   'Python Development',
-  'Others'
+  'Others',
 ]
 
 export const projects = [
@@ -42,7 +42,8 @@ export const projects = [
       'Used a dataset containing 14,700 medical images.',
       'Implemented Grad-CAM for model explainability.',
     ],
-    github: 'https://github.com/Smaransai2911/Multimodal-ViT-for-respiratory-disease-classification',
+    github:
+      'https://github.com/Smaransai2911/Multimodal-ViT-for-respiratory-disease-classification',
     demo: '',
     image: '',
   },
@@ -86,9 +87,9 @@ export const projects = [
     featured: true,
     title: 'Student Research Agent',
     category: [
-    'Artificial Intelligence / Machine Learning',
-    'Python Development',
-],
+      'Artificial Intelligence / Machine Learning',
+      'Python Development',
+    ],
     status: 'Developed',
     year: '2026',
     problem:
@@ -99,7 +100,7 @@ export const projects = [
       'A full-stack AI application combining a Python backend, an interactive interface and LLM API integrations.',
     stack: [
       'Python',
-
+      'JavaScript',
       'Streamlit',
       'Large Language Models',
       'LLM API Integration',
@@ -115,9 +116,11 @@ export const projects = [
     featured: true,
     title: 'Financial Time Series Forecasting ML Pipeline',
     category: [
-    'Artificial Intelligence / Machine Learning',
-    ' Data Analytics',
+      'Artificial Intelligence / Machine Learning',
+      'Data Analytics',
+      'Python Development',
     ],
+    status: 'Developed',
     problem:
       'Financial time series forecasting requires systematic data preparation, feature engineering and model evaluation.',
     solution:
