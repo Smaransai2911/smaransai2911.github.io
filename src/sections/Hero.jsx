@@ -1,3 +1,4 @@
+
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { ArrowDown } from 'lucide-react'
 import NeuralBackground from '../components/NeuralBackground'
@@ -55,6 +56,16 @@ export default function Hero({ onOpenMap }) {
             </Magnetic>
             <Magnetic>
               <a className="btn btn-ghost" href="/archive/">Enter The Synaptic Archive</a>
+            </Magnetic>
+            <Magnetic>
+              <a
+                className="btn btn-ghost"
+                href={social.linkedin.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Connect on LinkedIn
+              </a>
             </Magnetic>
           </motion.div>
 
