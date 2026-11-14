@@ -106,10 +106,10 @@ export const education = [
 export const certifications = {
   // Issuer wall only. Add `title`, `year`, `url`, `image` once each credential is verified.
   items: [
-    { issuer: 'Microsoft', title: '', year: '', url: '', image: '' },
-    { issuer: 'NVIDIA', title: '', year: '', url: '', image: '' },
-    { issuer: 'Oracle', title: '', year: '', url: '', image: '' },
-    { issuer: 'Tata', title: '', year: '', url: '', image: '' },
+    { issuer: 'Microsoft', title: 'Azure AI Fundamentals', year: 'June 2025', url: '', image: '' },
+    { issuer: 'NVIDIA', title: 'uilding LLM Applications With Prompt Engineering', year: 'January 2025', url: '', image: '' },
+    { issuer: 'Oracle', title: 'AI Foundations Associate & Generative AI Professional', year: 'August 2025', url: '', image: '' },
+    { issuer: 'Tata', title: 'GenAI Powered Data Analytics Job Simulation', year: 'January 2026', url: '', image: '' },
   ],
 }
 
