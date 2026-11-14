@@ -11,6 +11,7 @@ export const projectCategories = [
   'Data Engineering',
   'Data Analytics',
   'Python Development',
+  'Others'
 ]
 
 export const projects = [
@@ -41,7 +42,7 @@ export const projects = [
       'Used a dataset containing 14,700 medical images.',
       'Implemented Grad-CAM for model explainability.',
     ],
-    github: '',
+    github: 'https://github.com/Smaransai2911/Multimodal-ViT-for-respiratory-disease-classification',
     demo: '',
     image: '',
   },
@@ -51,7 +52,7 @@ export const projects = [
     sample: false,
     featured: true,
     title: 'Alliance University Virtual Assistant (AU-ChatBot)',
-    category: 'Python Development',
+    category: 'Others',
     status: 'Completed',
     year: '2025',
     problem:
@@ -74,7 +75,7 @@ export const projects = [
       'Webhook automation reduced resolution time by 60%.',
       'Maintained structured documentation and version-controlled code.',
     ],
-    github: '',
+    github: 'https://github.com/Smaransai2911/AU-ChatBot',
     demo: '',
     image: '',
   },
@@ -84,7 +85,10 @@ export const projects = [
     sample: false,
     featured: true,
     title: 'Student Research Agent',
-    category: 'Artificial Intelligence / Machine Learning',
+    category: [
+    'Artificial Intelligence / Machine Learning',
+    'Python Development',
+],
     status: 'Developed',
     year: '2026',
     problem:
@@ -95,10 +99,43 @@ export const projects = [
       'A full-stack AI application combining a Python backend, an interactive interface and LLM API integrations.',
     stack: [
       'Python',
-      'JavaScript',
+
       'Streamlit',
       'Large Language Models',
       'LLM API Integration',
+    ],
+    github: 'https://github.com/Smaransai2911/student-research-agent',
+    demo: '',
+    image: '',
+  },
+
+  {
+    id: 'financial-time-series-forecasting',
+    sample: false,
+    featured: true,
+    title: 'Financial Time Series Forecasting ML Pipeline',
+    category: [
+    'Artificial Intelligence / Machine Learning',
+  ' Data Analytics',
+    ],
+    problem:
+      'Financial time series forecasting requires systematic data preparation, feature engineering and model evaluation.',
+    solution:
+      'Built an end-to-end machine learning pipeline using Python for data ingestion, feature engineering, model training and evaluation. Applied systematic model selection and hyperparameter tuning to improve forecasting performance.',
+    description:
+      'A Python-based machine learning pipeline for financial time series forecasting.',
+    stack: [
+      'Python',
+      'Pandas',
+      'NumPy',
+      'Scikit-learn',
+      'Machine Learning',
+      'Time Series Forecasting',
+    ],
+    highlights: [
+      'Achieved 85% forecasting accuracy.',
+      'Reduced RMSE by 25%.',
+      'Applied model selection and hyperparameter tuning.',
     ],
     github: '',
     demo: '',
